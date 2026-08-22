@@ -29,7 +29,7 @@ conda create -n nade-mnist python=3.10 -y
 conda activate nade-mnist
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-
+```
 
 ## 数据准备
 
