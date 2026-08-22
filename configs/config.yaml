@@ -1,0 +1,22 @@
+# Paths
+data_dir: data
+
+# Data preprocessing
+binarization: fixed
+threshold: 0.5
+validation_size: 10000
+
+# Model
+hidden_dim: 128
+init_std: 0.01
+
+# Training
+epochs: 20
+batch_size: 128
+learning_rate: 0.001
+grad_clip: 5.0
+
+# Runtime and output
+seed: 42
+num_workers: 0
+num_samples: 64
