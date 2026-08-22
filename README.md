@@ -152,6 +152,3 @@ NLL 和 bits/dim 越低，表示模型对 MNIST 数据分布的拟合越好。NA
 - Hugo Larochelle and Iain Murray, [The Neural Autoregressive Distribution
   Estimator](https://proceedings.mlr.press/v15/larochelle11a.html), AISTATS 2011
 
-## License
-
-MIT
