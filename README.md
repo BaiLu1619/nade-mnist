@@ -22,7 +22,7 @@ NADE-MNIST 是一个基于 PyTorch 的生成模型项目，采用神经自回归
 
 环境要求：Python 3.10、3.11 或 3.12。
 
-可以先创建虚拟环境，在安装相关依赖
+可以先创建虚拟环境，再安装相关依赖
 
 ```bash
 conda create -n nade-mnist python=3.10 -y
