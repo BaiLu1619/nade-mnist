@@ -4,6 +4,7 @@
 
 NADE-MNIST 是一个基于 PyTorch 的生成模型项目，采用神经自回归分布估计器（Neural Autoregressive Distribution Estimator，NADE）学习图像数据的联合概率分布。
 本项目支持两种 NADE 模型：
+
 - Bernoulli NADE：面向二值离散数据，通过伯努利分布对像素进行建模与生成。
 - Categorical NADE：面向多类别离散数据，基于类别分布和 Softmax 函数完成概率建模与样本生成。
 
@@ -194,7 +195,7 @@ h_i = \sigma\left(c + \sum_{j=0}^{i-1}E_{j,x_j}\right)
 
 ```math
 p\left(x_i=k \mid x_{0:i}\right)
-= \operatorname{softmax}\left(A_i h_i+b_i\right)_k
+= \mathrm{softmax}\left(A_i h_i+b_i\right)_k
 ```
 
 ```math
