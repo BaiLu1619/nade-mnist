@@ -1,20 +1,21 @@
 # Paths
 data_dir: data
-dataset: mnist
+dataset: fashion_mnist
 
-# Data preprocessing
-representation: binary
+# Preserve each original uint8 grayscale value as one of 256 categories.
+representation: categorical
+num_categories: 256
 binarization: fixed
 threshold: 0.5
 validation_size: 10000
 
 # Model
-hidden_dim: 128
+hidden_dim: 32
 init_std: 0.01
 
 # Training
 epochs: 20
-batch_size: 128
+batch_size: 32
 learning_rate: 0.001
 grad_clip: 5.0
 

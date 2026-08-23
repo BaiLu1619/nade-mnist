@@ -34,6 +34,7 @@ def save_comparison_grid(
     output: str | Path,
     *,
     nrow: int = 8,
+    model_label: str = "NADE",
 ) -> None:
     """Save labeled real/generated grids side by side."""
     if real_images.ndim != 4 or generated_images.ndim != 4:
@@ -63,7 +64,7 @@ def save_comparison_grid(
     draw.text((8, 7), f"Real (n={count})", fill="black")
     canvas.paste(real_grid, (0, title_height))
     generated_x = real_grid.width + section_gap
-    draw.text((generated_x + 8, 7), f"NADE (n={count})", fill="black")
+    draw.text((generated_x + 8, 7), f"{model_label} (n={count})", fill="black")
     canvas.paste(generated_grid, (generated_x, title_height))
 
     destination = Path(output)

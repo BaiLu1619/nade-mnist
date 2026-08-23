@@ -1,4 +1,4 @@
-"""MNIST preprocessing: convert grayscale pixels to binary values."""
+"""Convert grayscale images to binary or categorical tensors."""
 
 from typing import Literal
 
@@ -23,3 +23,12 @@ class Binarize:
         if self.mode == "fixed":
             return (image >= self.threshold).to(torch.float32)
         return torch.bernoulli(image).to(torch.float32)
+
+
+class ToCategorical:
+    """Preserve an 8-bit grayscale tensor as integer categories 0, ..., 255."""
+
+    def __call__(self, image: Tensor) -> Tensor:
+        if image.dtype != torch.uint8:
+            raise TypeError("categorical grayscale input must use torch.uint8")
+        return image.to(torch.long)
