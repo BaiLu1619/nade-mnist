@@ -1,4 +1,4 @@
-# Paths
+# Bernoulli NADE uses MNIST.
 data_dir: data
 dataset: mnist
 

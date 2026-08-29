@@ -1,1 +1,0 @@
-"""NADE-MNIST source package."""

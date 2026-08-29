@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nade"
+version = "0.1.0"
+description = "Bernoulli, categorical, and real-valued Neural Autoregressive Distribution Estimators"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+license = "MIT"
+keywords = ["nade", "autoregressive-model", "generative-model", "pytorch"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "numpy>=1.26,<3",
+  "pillow>=10,<13",
+  "torch==2.13.0",
+  "torchvision==0.28.0",
+]
+
+[project.scripts]
+nade = "nade.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nade"]

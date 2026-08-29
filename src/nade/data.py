@@ -10,13 +10,13 @@ from typing import Literal
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader, Subset, random_split
 from torchvision import datasets, transforms
 
-from src.preprocess import BinarizationMode, Binarize, ToCategorical
+from nade.preprocessing import BinarizationMode, Binarize, ToCategorical
 
-DatasetName = Literal["mnist", "fashion_mnist", "kmnist"]
-Representation = Literal["binary", "categorical"]
+DatasetName = Literal["mnist", "fashion_mnist", "white_wine"]
+Representation = Literal["binary", "categorical", "continuous"]
 
 
 class _FlatFolders:
@@ -41,25 +41,28 @@ class MirroredMNIST(_FlatFolders, datasets.MNIST):
     ]
 
 
-
 class FlatFashionMNIST(_FlatFolders, datasets.FashionMNIST):
     """Fashion-MNIST stored below data/fashion_mnist."""
 
-
-class FlatKMNIST(_FlatFolders, datasets.KMNIST):
-    """Kuzushiji-MNIST stored below data/kmnist."""
+    mirrors = [
+        (
+            "https://raw.githubusercontent.com/zalandoresearch/"
+            "fashion-mnist/master/data/fashion/"
+        ),
+        "https://storage.googleapis.com/tensorflow/tf-keras-datasets/",
+        *datasets.FashionMNIST.mirrors,
+    ]
 
 
 DATASET_CLASSES = {
     "mnist": MirroredMNIST,
     "fashion_mnist": FlatFashionMNIST,
-    "kmnist": FlatKMNIST,
 }
 
 DATASET_TITLES = {
     "mnist": "MNIST",
     "fashion_mnist": "Fashion-MNIST",
-    "kmnist": "KMNIST",
+    "white_wine": "UCI White Wine Quality",
 }
 
 
@@ -89,12 +92,15 @@ def _transform(
         )
     if representation == "categorical":
         return transforms.Compose([transforms.PILToTensor(), ToCategorical()])
-    raise ValueError("representation must be 'binary' or 'categorical'")
+    if representation == "continuous":
+        return transforms.ToTensor()
+    raise ValueError(
+        "representation must be 'binary', 'categorical', or 'continuous'"
+    )
 
 
 def _dataset_root(data_dir: str | Path, dataset_name: DatasetName) -> Path:
-    root = Path(data_dir)
-    return root if dataset_name == "mnist" else root / dataset_name
+    return Path(data_dir) / dataset_name
 
 
 def _dataset_class(dataset_name: DatasetName):
@@ -102,14 +108,22 @@ def _dataset_class(dataset_name: DatasetName):
         return DATASET_CLASSES[dataset_name]
     except KeyError as error:
         choices = ", ".join(DATASET_CLASSES)
-        raise ValueError(f"unknown dataset {dataset_name!r}; choose from: {choices}") from error
+        raise ValueError(
+            f"unknown dataset {dataset_name!r}; choose from: {choices}"
+        ) from error
 
 
 def download_dataset(
     data_dir: str | Path = "data",
     dataset_name: DatasetName = "mnist",
 ) -> None:
-    """Download and verify both splits of a supported grayscale dataset."""
+    """Download and validate a supported dataset."""
+    if dataset_name == "white_wine":
+        from nade.tabular import download_white_wine
+
+        destination = download_white_wine(data_dir)
+        print(f"UCI White Wine Quality is ready: {destination.resolve()}")
+        return
     dataset_class = _dataset_class(dataset_name)
     destination = _dataset_root(data_dir, dataset_name)
     title = DATASET_TITLES[dataset_name]
@@ -117,11 +131,6 @@ def download_dataset(
     dataset_class(root=str(destination), train=True, download=True)
     dataset_class(root=str(destination), train=False, download=True)
     print(f"{title} is ready.")
-
-
-def download_mnist(data_dir: str | Path = "data") -> None:
-    """Backward-compatible MNIST download helper."""
-    download_dataset(data_dir, "mnist")
 
 
 def _load_dataset(
@@ -159,6 +168,8 @@ def get_image_loaders(
     representation: Representation = "binary",
     batch_size: int = 128,
     validation_size: int = 10_000,
+    train_size: int | None = None,
+    test_size: int | None = None,
     num_workers: int = 0,
     seed: int = 42,
     binarization: BinarizationMode = "fixed",
@@ -190,10 +201,24 @@ def get_image_loaders(
         )
 
     split_generator = torch.Generator().manual_seed(seed)
-    train_size = len(train_dataset) - validation_size
+    available_train_size = len(train_dataset) - validation_size
     train_subset, validation_subset = random_split(
-        train_dataset, [train_size, validation_size], generator=split_generator
+        train_dataset,
+        [available_train_size, validation_size],
+        generator=split_generator,
     )
+    if train_size is not None:
+        if not 0 < train_size <= len(train_subset):
+            raise ValueError(
+                f"train_size must be between 1 and {len(train_subset)}"
+            )
+        train_subset = Subset(train_subset, range(train_size))
+    if test_size is not None:
+        if not 0 < test_size <= len(test_dataset):
+            raise ValueError(
+                f"test_size must be between 1 and {len(test_dataset)}"
+            )
+        test_dataset = Subset(test_dataset, range(test_size))
     train_generator = torch.Generator().manual_seed(seed + 1)
     common = {
         "batch_size": batch_size,
@@ -211,20 +236,4 @@ def get_image_loaders(
         validation=validation_loader,
         test=test_loader,
         train_generator=train_generator,
-    )
-
-
-# Keep the original API available for the binary MNIST workflow.
-MNISTLoaders = ImageLoaders
-
-
-def get_mnist_loaders(
-    data_dir: str | Path,
-    **kwargs,
-) -> ImageLoaders:
-    return get_image_loaders(
-        data_dir,
-        dataset_name="mnist",
-        representation="binary",
-        **kwargs,
     )

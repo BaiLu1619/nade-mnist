@@ -1,4 +1,4 @@
-"""Create grids that compare real MNIST images and generated samples."""
+"""Create grids that compare real images and generated samples."""
 
 from __future__ import annotations
 
@@ -50,7 +50,9 @@ def save_comparison_grid(
         "padding": 2,
         "pad_value": 1.0,
     }
-    real_grid = to_pil_image(make_grid(real_images[:count], **grid_options)).convert("RGB")
+    real_grid = to_pil_image(
+        make_grid(real_images[:count], **grid_options)
+    ).convert("RGB")
     generated_grid = to_pil_image(
         make_grid(generated_images[:count], **grid_options)
     ).convert("RGB")

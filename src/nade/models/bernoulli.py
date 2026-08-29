@@ -1,4 +1,4 @@
-"""Neural Autoregressive Distribution Estimator."""
+"""Bernoulli Neural Autoregressive Distribution Estimator."""
 
 from __future__ import annotations
 

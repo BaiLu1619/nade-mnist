@@ -1,4 +1,4 @@
-"""Configuration and reproducibility utilities."""
+"""Configuration loading and reproducibility utilities."""
 
 from __future__ import annotations
 

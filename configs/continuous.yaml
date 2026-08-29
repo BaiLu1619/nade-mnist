@@ -1,0 +1,28 @@
+# UCI White Wine was used in the original RNADE paper.
+data_dir: data
+dataset: white_wine
+
+# Model only the 11 real-valued physicochemical features; `quality` is excluded.
+representation: continuous
+train_size: 3898
+validation_size: 500
+test_size: 500
+
+# Equally weighted Gaussian mixture conditionals
+hidden_dim: 64
+num_components: 10
+min_std: 0.01
+init_std: 0.01
+
+# Training
+epochs: 10
+batch_size: 128
+learning_rate: 0.001
+grad_clip: 5.0
+
+# Runtime and output
+seed: 42
+num_workers: 0
+num_samples: 256
+samples_path: outputs/rnade_white_wine_samples.csv
+statistics_path: outputs/rnade_white_wine_statistics.csv

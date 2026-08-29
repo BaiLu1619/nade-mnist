@@ -1,4 +1,4 @@
-"""NADE for non-binary discrete variables."""
+"""Categorical Neural Autoregressive Distribution Estimator."""
 
 from __future__ import annotations
 

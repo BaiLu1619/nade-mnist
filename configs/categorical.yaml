@@ -1,12 +1,10 @@
-# Paths
+# Categorical NADE uses Fashion-MNIST.
 data_dir: data
 dataset: fashion_mnist
 
 # Preserve each original uint8 grayscale value as one of 256 categories.
 representation: categorical
 num_categories: 256
-binarization: fixed
-threshold: 0.5
 validation_size: 10000
 
 # Model

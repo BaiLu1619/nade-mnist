@@ -1,4 +1,4 @@
-"""Convert grayscale images to binary or categorical tensors."""
+"""Convert grayscale images into distributions supported by NADE models."""
 
 from typing import Literal
 

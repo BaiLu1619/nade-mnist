@@ -1,4 +1,4 @@
-"""Run the installed NADE command-line interface."""
+"""Allow the project to run with ``python -m nade``."""
 
 from nade.cli import main
 
