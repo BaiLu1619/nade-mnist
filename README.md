@@ -9,8 +9,7 @@ NADE 是一个基于 PyTorch 的自回归生成模型项目，采用神经自回
 - RNADE：面向连续数据，使用等权高斯混合分布对每个条件概率密度进行建模与采样。
 
 
-本项目中 Bernoulli NADE 和 Categorical NADE 用于图像生成，RNADE 用于连续表格数据的密度
-估计。相同的自回归分解方法还可以扩展到文本、序列及其他多维数据。
+本项目中 Bernoulli NADE 和 Categorical NADE 用于图像生成，RNADE 用于连续表格数据的密度估计。相同的自回归分解方法还可以扩展到文本、序列及其他多维数据。
 
 
 ## 功能特性
@@ -33,7 +32,7 @@ NADE 是一个基于 PyTorch 的自回归生成模型项目，采用神经自回
 ```bash
 uv venv --python 3.10
 source .venv/bin/activate
-uv pip install -e .
+uv pip install -r requirements.txt
 ```
 
 Windows PowerShell 使用 `.venv\Scripts\Activate.ps1` 激活虚拟环境。
@@ -49,7 +48,7 @@ Windows PowerShell 使用 `.venv\Scripts\Activate.ps1` 激活虚拟环境。
 | [Fashion-MNIST](https://docs.pytorch.org/vision/main/generated/torchvision.datasets.FashionMNIST.html) | 服装和鞋包图像 | `categorical.yaml` |
 | [UCI White Wine](https://archive.ics.uci.edu/dataset/186/wine+quality) | 11 个连续理化特征 | `continuous.yaml` |
 
-MNIST 的笔画和背景适合 Bernoulli NADE 的二值建模；Fashion-MNIST 的灰度层次和纹理更丰富，适合观察 Categorical NADE 的非二值生成效果；UCI White Wine 是RNADE 原论文使用的连续数据集，模型使用其中 11 个理化特征，并排除离散的 `quality` 标签。
+MNIST 的笔画和背景适合 Bernoulli NADE 的二值建模；Fashion-MNIST 的灰度层次和纹理更丰富，适合观察 Categorical NADE 的非二值生成效果；UCI White Wine 是 RNADE 原论文使用的连续数据集，模型使用其中 11 个理化特征，并排除离散的 `quality` 标签。
 
 根据需要指定并下载对应数据集：
 
@@ -215,7 +214,7 @@ h_i = \sigma\left(c + \sum_{j=0}^{i-1}E_{j,x_j}\right)
 
 ```math
 p(x_i=k \mid \boldsymbol{x}_{<i})
-= \operatorname{softmax}(A_i h_i+b_i)_k
+= \mathrm{softmax}(A_i h_i+b_i)_k
 ```
 
 ### 连续型 RNADE
@@ -242,7 +241,7 @@ Softplus 和最小值约束为正：
 ```
 
 ```math
-\sigma_i^k = \operatorname{softplus}(s_i^k)+\sigma_{\min} > 0
+\sigma_i^k = \mathrm{softplus}(s_i^k)+\sigma_{\min} > 0
 ```
 
 训练目标是整个样本的负对数似然：
@@ -265,7 +264,7 @@ nade/
 │   └── continuous.yaml
 ├── data/
 │   └── README.md
-├── src/nade/
+├── nade/
 │   ├── models/
 │   │   ├── bernoulli.py
 │   │   ├── categorical.py
@@ -279,21 +278,43 @@ nade/
 │   ├── training.py
 │   └── visualization.py
 ├── main.py
-├── pyproject.toml
+├── requirements.txt
 └── README.md
 ```
 
 ## 输出结果
 
-训练过程中会输出训练集与验证集 NLL，以及验证集 bits/dim。程序以验证集 NLL 为
-依据保留最优模型，并在训练结束后恢复该模型，用于测试和样本生成。Bernoulli 和
-Categorical 模型生成 `comparison.png`；RNADE 生成：
+### 训练与评估指标
 
-- `outputs/rnade_white_wine_samples.csv`：反标准化后的连续样本
-- `outputs/rnade_white_wine_statistics.csv`：测试数据与生成数据的逐特征均值和标准差
+训练期间，程序会逐轮输出训练集和验证集指标。训练结束后，将恢复验证集 NLL 最低
+轮次的模型，并使用该模型完成测试和样本生成。
 
-NLL 和 bits/dim 越低，表示同一种数据表示下的密度拟合越好。连续密度与离散概率的
-度量定义不同，因此不应直接比较连续模式和离散模式的数值。
+- `train NLL`：训练集平均负对数似然
+- `validation NLL`：验证集平均负对数似然，用于选择最优模型
+- `bits/dim`：平均每个维度所需的比特数，便于比较同一数据表示下的模型
+
+NLL 和 bits/dim 均为越低越好。连续密度与离散概率的度量定义不同，因此不应直接
+比较连续模型与离散模型的指标数值。
+
+### 图像模型
+
+Bernoulli NADE 和 Categorical NADE 会在项目根目录生成 `comparison.png`：
+
+- 左侧 `Real`：测试集中的真实图像
+- 右侧模型名称：NADE 生成的样本
+
+两侧图像数量由配置项 `num_samples` 控制，可用于直观比较真实数据与生成结果。
+
+### 连续模型
+
+RNADE 会在 `outputs/` 目录生成以下文件：
+
+- `rnade_white_wine_samples.csv`：生成的连续样本；每行表示一条样本，每列对应一个
+  White Wine 理化特征，数值已还原到原始单位
+- `rnade_white_wine_statistics.csv`：真实测试数据与生成数据的逐特征统计结果，包括
+  均值和标准差
+
+这些结果可用于检查生成样本的取值范围，以及模型是否学习到各个特征的边缘分布。
 
 ## 参考资料
 
