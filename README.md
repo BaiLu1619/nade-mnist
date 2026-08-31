@@ -8,9 +8,7 @@ NADE 是一个基于 PyTorch 的自回归生成模型项目，采用神经自回
 - Categorical NADE：面向多类别离散数据，基于类别分布和 Softmax 函数进行概率建模与样本生成。
 - RNADE：面向连续数据，使用等权高斯混合分布对每个条件概率密度进行建模与采样。
 
-
 本项目中 Bernoulli NADE 和 Categorical NADE 用于图像生成，RNADE 用于连续表格数据的密度估计。相同的自回归分解方法还可以扩展到文本、序列及其他多维数据。
-
 
 ## 功能特性
 
@@ -36,7 +34,6 @@ uv pip install -r requirements.txt
 ```
 
 Windows PowerShell 使用 `.venv\Scripts\Activate.ps1` 激活虚拟环境。
-
 
 ## 数据集
 
@@ -284,15 +281,13 @@ nade/
 
 ### 训练与评估指标
 
-训练期间，程序会逐轮输出训练集和验证集指标。训练结束后，将恢复验证集 NLL 最低
-轮次的模型，并使用该模型完成测试和样本生成。
+训练期间，程序会逐轮输出训练集和验证集指标。训练结束后，将恢复验证集 NLL 最低轮次的模型，并使用该模型完成测试和样本生成。
 
 - `train NLL`：训练集平均负对数似然
 - `validation NLL`：验证集平均负对数似然，用于选择最优模型
 - `bits/dim`：平均每个维度所需的比特数，便于比较同一数据表示下的模型
 
-NLL 和 bits/dim 均为越低越好。连续密度与离散概率的度量定义不同，因此不应直接
-比较连续模型与离散模型的指标数值。
+NLL 和 bits/dim 均为越低越好。连续密度与离散概率的度量定义不同，因此不应直接比较连续模型与离散模型的指标数值。
 
 ### 图像模型
 
@@ -307,19 +302,13 @@ Bernoulli NADE 和 Categorical NADE 会在项目根目录生成 `comparison.png`
 
 RNADE 会在 `outputs/` 目录生成以下文件：
 
-- `rnade_white_wine_samples.csv`：生成的连续样本；每行表示一条样本，每列对应一个
-  White Wine 理化特征，数值已还原到原始单位
-- `rnade_white_wine_statistics.csv`：真实测试数据与生成数据的逐特征统计结果，包括
-  均值和标准差
+- `rnade_white_wine_samples.csv`：生成的连续样本；每行表示一条样本，每列对应一个 White Wine 理化特征，数值已还原到原始单位
+- `rnade_white_wine_statistics.csv`：真实测试数据与生成数据的逐特征统计结果，包括均值和标准差
 
 这些结果可用于检查生成样本的取值范围，以及模型是否学习到各个特征的边缘分布。
 
 ## 参考资料
 
-- Hugo Larochelle and Iain Murray, [The Neural Autoregressive Distribution
-  Estimator](https://proceedings.mlr.press/v15/larochelle11a.html), AISTATS 2011
-- Benigno Uria, Iain Murray and Hugo Larochelle,
-  [RNADE: The real-valued neural autoregressive density-estimator](https://proceedings.neurips.cc/paper/2013/hash/53adaf494dc89ef7196d73636eb2451b-Abstract.html),
-  NeurIPS 2013
-- Paulo Cortez et al., [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality),
-  UCI Machine Learning Repository, 2009
+- Hugo Larochelle and Iain Murray, [The Neural Autoregressive Distribution Estimator](https://proceedings.mlr.press/v15/larochelle11a.html), AISTATS 2011
+- Benigno Uria, Iain Murray and Hugo Larochelle, [RNADE: The real-valued neural autoregressive density-estimator](https://proceedings.neurips.cc/paper/2013/hash/53adaf494dc89ef7196d73636eb2451b-Abstract.html), NeurIPS 2013
+- Paulo Cortez et al., [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality), UCI Machine Learning Repository, 2009
