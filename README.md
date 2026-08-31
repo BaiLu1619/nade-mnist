@@ -184,10 +184,11 @@ UCI White Wine CSV
 一个样本表示为 $D$ 个有固定顺序的变量。模型将联合分布分解为：
 
 ```math
-p(\boldsymbol{x}) = \prod_{i=0}^{D-1} p(x_i \mid \boldsymbol{x}_{<i})
+p(x_0,\ldots,x_{D-1})
+= \prod_{i=0}^{D-1} p(x_i \mid x_0,\ldots,x_{i-1})
 ```
 
-其中 $\boldsymbol{x}_{<i}=(x_0,\ldots,x_{i-1})$ 表示当前位置之前的所有变量。
+每个条件概率只依赖当前位置之前的变量，即第 0 个变量到第 $i-1$ 个变量。
 
 ### 二值 NADE
 
@@ -198,7 +199,7 @@ h_i = \sigma\left(c + \sum_{j=0}^{i-1} W_jx_j\right)
 ```
 
 ```math
-p(x_i=1 \mid \boldsymbol{x}_{<i})
+p(x_i=1 \mid x_0,\ldots,x_{i-1})
 = \sigma\left(b_i + V_i^{\mathsf T}h_i\right)
 ```
 
@@ -213,7 +214,7 @@ h_i = \sigma\left(c + \sum_{j=0}^{i-1}E_{j,x_j}\right)
 输出层为位置 $i$ 生成 256 个 logits，并通过 Softmax 得到类别概率：
 
 ```math
-p(x_i=k \mid \boldsymbol{x}_{<i})
+p(x_i=k \mid x_0,\ldots,x_{i-1})
 = \mathrm{softmax}(A_i h_i+b_i)_k
 ```
 
@@ -222,7 +223,7 @@ p(x_i=k \mid \boldsymbol{x}_{<i})
 当 $x_i\in\mathbb{R}$ 时，每个条件分布由 $K$ 个等权一维高斯分布组成：
 
 ```math
-p(x_i \mid \boldsymbol{x}_{<i})
+p(x_i \mid x_0,\ldots,x_{i-1})
 = \sum_{k=1}^{K}\frac{1}{K}
 \mathcal{N}\left(x_i;\mu_i^k,(\sigma_i^k)^2\right)
 ```
@@ -247,8 +248,8 @@ Softplus 和最小值约束为正：
 训练目标是整个样本的负对数似然：
 
 ```math
-\mathcal{L}(\boldsymbol{x})
-= -\sum_{i=0}^{D-1}\log p(x_i \mid \boldsymbol{x}_{<i})
+\mathcal{L}(x_0,\ldots,x_{D-1})
+= -\sum_{i=0}^{D-1}\log p(x_i \mid x_0,\ldots,x_{i-1})
 ```
 
 训练时可以利用累积和并行计算全部隐藏状态；生成时需要按照变量顺序，从对应条件
